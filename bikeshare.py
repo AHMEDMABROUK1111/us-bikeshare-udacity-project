@@ -19,7 +19,8 @@ def get_filters():
     # TO DO: get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     while True:
       city = input("Please enter a city?/n New York City, Chicago or Washington?")
-      if city not in ('New York City', 'Chicago', 'Washington'):
+      city = city.lower()
+      if city not in ('chicago', 'new york city', 'washington'):
         print("SORRY, I could not get your input.")
         continue
       else:
@@ -30,7 +31,8 @@ def get_filters():
     # TO DO: get user input for month (all, january, february, ... , june)
     while True:
       month = input("Please enter a month?/n (all, january, february, ... , june)/n")
-      if month not in ('January', 'February', 'March', 'April', 'May', 'June', 'all'):
+      month = month.lower()
+      if month not in ('january', 'february', 'march', 'april', 'may', 'june', 'all'):
         print("SORRY, I could not get your input.")
         continue
       else:
@@ -40,7 +42,8 @@ def get_filters():
     # TO DO: get user input for day of week (all, monday, tuesday, ... sunday)
     while True:
       day = input("Please enter a day in the week?/n 'Sunday', 'Monday', 'Tuesday',....., 'Saturday', 'all'/n")
-      if day not in ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'all'):
+      day = day.lower()
+      if day not in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'all'):
         print("SORRY, I could not get your input.")
         continue
       else:
@@ -70,7 +73,7 @@ def load_data(city, month, day):
 
     # extract month and day of week from Start Time to create new columns
     df['month'] = df['Start Time'].dt.month
-    df['day_of_week'] = df['Start Time'].dt.weekday_name
+    df['day_of_week'] = df['Start Time'].dt
 
 
     # filter by month if applicable
@@ -127,16 +130,17 @@ def station_stats(df):
     start_time = time.time()
 
     # TO DO: display most commonly used start station
-    Start_Station = df['Start Station'].value_counts().idxmax()
+    Start_Station = df['Start Station'].mode()[0]
     print('Most Frequent start station:', Start_Station)
 
     # TO DO: display most commonly used end station
-    end_station = df['End Station'].value_counts().idxmax()
-    print('Most Frequent end station:', end_station)
+    End_station = df['End Station'].mode()[0]
+    print('Most Frequent end station:', End_station)
 
     # TO DO: display most frequent combination of start station and end station trip
-    both_Stations = df.groupby(['Start Station', 'End Station']).count()
-    print('Most frequently used stations:{}'.format(both_Stations))
+    df['combination'] = df['Start Station'] + " " + df['End Station']
+    combination = df['combination'].mode()[0]
+    print('Most frequently used stations:{}'.format(combination))
     
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40) 
@@ -150,7 +154,7 @@ def trip_duration_stats(df):
     start_time = time.time()
 
     # TO DO: display total travel time
-    total_t_time = sum(df['Trip Duration'])/86400
+    total_t_time = df['Trip Duration'].sum()
     print("total travel time is:{} days".format(total_t_time))
 
     # TO DO: display mean travel time
@@ -233,4 +237,5 @@ def main():
 
 
 if __name__ == "__main__":
-  main()
+  
+  	main()
