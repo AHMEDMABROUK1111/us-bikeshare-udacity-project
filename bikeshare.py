@@ -1,6 +1,7 @@
-import time
 import pandas as pd
 import numpy as np
+import time
+import calendar
 
 CITY_DATA = { 'chicago': 'chicago.csv',
               'new york city': 'new_york_city.csv',
@@ -18,9 +19,9 @@ def get_filters():
     print('Hello! Let\'s explore some US bikeshare data!')
     # TO DO: get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     while True:
-      city = input("Please enter a city?/n New York City, Chicago or Washington?")
+      city = input("Please enter a city?\nNew York City\nChicago\nWashington?\n")
       city = city.lower()
-      if city not in ('chicago', 'new york city', 'washington'):
+      if city not in CITY_DATA:
         print("SORRY, I could not get your input.")
         continue
       else:
@@ -30,7 +31,7 @@ def get_filters():
 
     # TO DO: get user input for month (all, january, february, ... , june)
     while True:
-      month = input("Please enter a month?/n (all, january, february, ... , june)/n")
+      month = input("Please enter a month?\n (all, january, february, ... , june)\n")
       month = month.lower()
       if month not in ('january', 'february', 'march', 'april', 'may', 'june', 'all'):
         print("SORRY, I could not get your input.")
@@ -41,7 +42,7 @@ def get_filters():
 
     # TO DO: get user input for day of week (all, monday, tuesday, ... sunday)
     while True:
-      day = input("Please enter a day in the week?/n 'Sunday', 'Monday', 'Tuesday',....., 'Saturday', 'all'/n")
+      day = input("Please enter a day in the week?\n 'Sunday', 'Monday', 'Tuesday',....., 'Saturday', 'all'\n")
       day = day.lower()
       if day not in ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'all'):
         print("SORRY, I could not get your input.")
@@ -73,7 +74,7 @@ def load_data(city, month, day):
 
     # extract month and day of week from Start Time to create new columns
     df['month'] = df['Start Time'].dt.month
-    df['day_of_week'] = df['Start Time'].dt
+    df['day_of_week'] = df['Start Time'].dt.day_name()
 
 
     # filter by month if applicable
@@ -138,8 +139,7 @@ def station_stats(df):
     print('Most Frequent end station:', End_station)
 
     # TO DO: display most frequent combination of start station and end station trip
-    df['combination'] = df['Start Station'] + " " + df['End Station']
-    combination = df['combination'].mode()[0]
+    combination = (df["Start Station"] + " " + df["End Station"]).mode()[0]
     print('Most frequently used stations:{}'.format(combination))
     
     print("\nThis took %s seconds." % (time.time() - start_time))
@@ -149,22 +149,28 @@ def station_stats(df):
     
 def trip_duration_stats(df):
     """Displays statistics on the total and average trip duration."""
-
     print('\nCalculating Trip Duration...\n')
     start_time = time.time()
 
     # TO DO: display total travel time
-    total_t_time = df['Trip Duration'].sum()
-    print("total travel time is:{} days".format(total_t_time))
+    total_t_time = sum(df["Trip Duration"])
+    minute, second = divmod(total_t_time, 60)
+    hour, minute = divmod(minute, 60)
+    print("The travel total time is {} hours, {} minutes and {} seconds".format(hour, minute, second))
 
     # TO DO: display mean travel time
-    
-
-    average_time = df['total_t_time'].mean()
-    print("the mean of the travel time is:{} minutes".format(average_time))
+    mean_t_time = df["Trip Duration"].mean()
+    minute, second = divmod(mean_t_time, 60)
+    if minute > 60:
+        hour, minute = divmod(minute, 60)
+        print("The mean travel time is {} hours, {} minutes and {} seconds.".format(hour, minute, second))
+    else:
+        print("The mean travel time is {} minutes and {} seconds.".format(minute, second))
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
+
+    
 
           #done......
 
@@ -192,7 +198,7 @@ def user_stats(df):
           
           #earliest year
     try:
-      earliest_Year =max(df['Birth Year'].value_counts())
+      earliest_Year =df['Birth Year'].min()
       print('Earliest Year:{}'.format(earliest_Year))  
     except KeyError:
       print("\nNo data available for this month.")
@@ -200,7 +206,7 @@ def user_stats(df):
     
           #most recent year
     try:
-      recent_Year = min(df['Birth Year'])
+      recent_Year = df['Birth Year'].max()
       print('most recent Year is :{}'.format(recent_Year))
     except KeyError:
       print("\nNo data available for this month.")
@@ -208,7 +214,7 @@ def user_stats(df):
           
           #common year
     try:
-      common_year = max(df['Birth Year'])
+      common_year = df['Birth Year'].mode()[0]
       print('most common year is:{}'.format(common_year))
     except KeyError:
       print("\nNo data available for this month.")
