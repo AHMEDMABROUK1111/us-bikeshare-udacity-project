@@ -225,8 +225,21 @@ def user_stats(df):
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
+   
+    #ask the user if he want to get specifice rows of the data.
+    
+    start_loc = 1
+    while True:
+        view_data = input('\nWould you like to view 5 rows of individual trip data? Enter yes or no\n')
+        if view_data.lower() == 'yes':
+            print(df.iloc[start_loc:start_loc + 5])
+            start_loc += 5
+        else:
+          break
+            
 
 
+        
 def main():
     while True:
         city, month, day = get_filters()
